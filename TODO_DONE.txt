@@ -1,0 +1,2 @@
+DONE:
+    1. modul numpy instalacja = pip3 install numpy
