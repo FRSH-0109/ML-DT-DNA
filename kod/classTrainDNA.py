@@ -32,18 +32,18 @@ class TrainDNA:
         attributes = []
         for dna_char in self.code_:
             attr = ''
-            if dna_char == 'G':
-                attr =  DnaAttrVal.G
+            if dna_char == 'A':
+                attr =  DnaAttrVal.A
             elif dna_char == 'C':
                 attr = DnaAttrVal.C
+            elif dna_char == 'G':
+                attr = DnaAttrVal.G
+            elif dna_char == 'N':
+                attr = DnaAttrVal.N # Verify if N is intentional in the data
+            elif dna_char == 'S':
+                attr = DnaAttrVal.S # Verify if S is intentional in the data
             elif dna_char == 'T':
                 attr = DnaAttrVal.T
-            elif dna_char == 'A':
-                attr = DnaAttrVal.A
-            elif dna_char == 'N': # Verify if N is intentional in the data
-                attr = DnaAttrVal.N
-            elif dna_char == 'S':
-                attr = DnaAttrVal.S
             attributes.append(attr)
         return attributes
 

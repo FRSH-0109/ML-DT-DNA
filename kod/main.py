@@ -1,5 +1,6 @@
 from loadData import parseDataToTrainDNA
 import numpy as np
+from sklearn import tree
 import classTrainDNA
 from decisionTree import DecisionTree
 from random import randint
@@ -79,12 +80,34 @@ def main():
         teach_array_values.append(element.getState())
         teach_array_data.append(element.getAttributes())
 
-    classifier = DecisionTree(min_sample_size=1)
+    sklearn_teach_array_data = []
+    for element in teach_array_data:
+        element_to_int = []
+        for attr in element:
+            attr_translation = {'A': 1, 'C': 2, 'G': 3, 'N': 4, 'S': 5, 'T': 6}
+            element_to_int.append(attr_translation[attr.value])
+        sklearn_teach_array_data.append(element_to_int)
+
+    sklearn_verify_array_data = []
+    for element in verify_array_data:
+        element_to_int = []
+        for attr in element:
+            attr_translation = {'A': 1, 'C': 2, 'G': 3, 'N': 4, 'S': 5, 'T': 6}
+            element_to_int.append(attr_translation[attr.value])
+        sklearn_verify_array_data.append(element_to_int)
+
+    classifier = DecisionTree()
     classifier.fit(np.array(teach_array_data), np.array(teach_array_values))
 
     predicitions = classifier.predict(verify_array_data)
     acc = accuracy(verify_array_values, predicitions)
-    print(acc)
+    print("Own implementation accuracy: " + str(acc))
+
+    clf = tree.DecisionTreeClassifier(criterion='entropy', max_depth=100, min_samples_split=3)
+    clf = clf.fit(sklearn_teach_array_data, teach_array_values)
+    sklearn_predictions = clf.predict(sklearn_verify_array_data)
+    sklearn_acc = accuracy(verify_array_values, sklearn_predictions)
+    print("Scikit-learn implementation accuracy: " + str(sklearn_acc))
 
     pass
 

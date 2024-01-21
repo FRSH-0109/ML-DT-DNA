@@ -4,7 +4,7 @@ from node import Node
 from collections import Counter
 
 class DecisionTree:
-    def __init__(self, min_sample_size=4, max_depth=100, gini_index=False):
+    def __init__(self, min_sample_size=3, max_depth=100, gini_index=False):
         self.min_sample_size = min_sample_size
         self.max_depth = max_depth
         self.gini_index = gini_index
@@ -25,7 +25,7 @@ class DecisionTree:
         n_labels = len(np.unique(values))
 
         # check if sttoping criteria are met
-        if (depth >= self.max_depth or n_labels == 1 or n_samples < self.min_sample_size):
+        if (depth >= self.max_depth or n_labels == 1 or n_samples <= self.min_sample_size):
             leaf_value = self.decide_leaf_value(values)
             return Node(value=leaf_value)
 
