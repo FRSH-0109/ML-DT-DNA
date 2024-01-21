@@ -111,7 +111,7 @@ def main():
     cm_display.plot()
     plt.title(label="Confusion matrix - our implementation")
     cm_figure = plt.gcf()
-    cm_figure.savefig('confusion_matrix', format='pdf')
+    cm_figure.savefig('confusion_matrix.pdf', format='pdf')
     plt.show()
 
     clf = tree.DecisionTreeClassifier(criterion='entropy', max_depth=100, min_samples_split=3)
@@ -125,7 +125,7 @@ def main():
     sklearn_cm_display.plot()
     plt.title(label="Confusion matrix - scikit-learn implementation")
     sklearn_cm_figure = plt.gcf()
-    sklearn_cm_figure.savefig('sklearn_confusion_matrix', format='pdf')
+    sklearn_cm_figure.savefig('sklearn_confusion_matrix.pdf', format='pdf')
     plt.show()
 
     pass
