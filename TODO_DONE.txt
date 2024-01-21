@@ -1,4 +1,7 @@
 DONE:
     1. modul numpy instalacja = pip3 install numpy
     2. pytest
-    3. scikit-learn - pip install -U scikit-learn
+    3. scikit-learn 
+    4. pip3 install pydotplus
+    5. pip3 install graphviz ??????
+    6. matplotlib

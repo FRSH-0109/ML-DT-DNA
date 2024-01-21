@@ -1,9 +1,16 @@
 from loadData import parseDataToTrainDNA
 import numpy as np
 from sklearn import tree
+from sklearn.tree import  export_graphviz
 import classTrainDNA
 from decisionTree import DecisionTree
 from random import randint
+
+#viz
+import graphviz
+import pydotplus
+from IPython.display import Image
+from matplotlib import pyplot as plt
 
 PATH_DTrain = "dane/spliceDTrainKIS.dat"
 PATH_ATrain = "dane/spliceATrainKIS.dat"
@@ -108,6 +115,16 @@ def main():
     sklearn_predictions = clf.predict(sklearn_verify_array_data)
     sklearn_acc = accuracy(verify_array_values, sklearn_predictions)
     print("Scikit-learn implementation accuracy: " + str(sklearn_acc))
+    
+    fig = plt.figure(figsize=(25, 20))
+    _ = tree.plot_tree(clf, filled=True)
+    fig.savefig("d_t.svg")
+
+
+    #dot_data = export_graphviz(clf, out_file="image.png", filled=True)
+
+    #graph =pydotplus.graph_from_dot_data(dot_data)
+    #Image(graph.create_png())
 
     pass
 
