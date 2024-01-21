@@ -10,6 +10,8 @@ PATH_DTrain = "dane/spliceDTrainKIS.dat"
 PATH_ATrain = "dane/spliceATrainKIS.dat"
 PATH_ATrain_small = "dane/spliceATrainKIS_small.dat"
 
+test_number = 5
+
 def createPoolTeachAndVerify(data_array, teach_ratio = float):
     data_array_size = len(data_array)
     teach_array = []
@@ -64,49 +66,88 @@ def main():
     dtrain_array = parseDataToTrainDNA(PATH_DTrain)
     atrain_array = parseDataToTrainDNA(PATH_ATrain)
     atrain_small_array = parseDataToTrainDNA(PATH_ATrain_small)
+    conf_matrix_buf = [[0, 0],[0, 0]]
+    conf_matrix_buf_skilearn = [[0, 0],[0, 0]]
 
-    #create teach and verify pool by given data, ratio is teach size to whole array size
-    teach_array, verify_array = createPoolTeachAndVerify(atrain_array, 0.5)
+    for i in range(0, test_number):
 
-    #prepare data to be passed to decision tree
-    verify_array_data = []
-    verify_array_values = []
-    for element in verify_array:
-        verify_array_values.append(element.getState())
-        verify_array_data.append(element.getAttributes())
+        #create teach and verify pool by given data, ratio is teach size to whole array size
+        teach_array, verify_array = createPoolTeachAndVerify(dtrain_array, 0.5)
 
-    teach_array_data = []
-    teach_array_values = []
-    for element in teach_array:
-        teach_array_values.append(element.getState())
-        teach_array_data.append(element.getAttributes())
+        #prepare data to be passed to decision tree
+        verify_array_data = []
+        verify_array_values = []
+        for element in verify_array:
+            verify_array_values.append(element.getState())
+            verify_array_data.append(element.getAttributes())
 
-    sklearn_teach_array_data = []
-    for element in teach_array_data:
-        element_to_int = []
-        for attr in element:
-            attr_translation = {'A': 1, 'C': 2, 'G': 3, 'N': 4, 'S': 5, 'T': 6}
-            element_to_int.append(attr_translation[attr.value])
-        sklearn_teach_array_data.append(element_to_int)
+        teach_array_data = []
+        teach_array_values = []
+        for element in teach_array:
+            teach_array_values.append(element.getState())
+            teach_array_data.append(element.getAttributes())
 
-    sklearn_verify_array_data = []
-    for element in verify_array_data:
-        element_to_int = []
-        for attr in element:
-            attr_translation = {'A': 1, 'C': 2, 'G': 3, 'N': 4, 'S': 5, 'T': 6}
-            element_to_int.append(attr_translation[attr.value])
-        sklearn_verify_array_data.append(element_to_int)
+        sklearn_teach_array_data = []
+        for element in teach_array_data:
+            element_to_int = []
+            for attr in element:
+                attr_translation = {'A': 1, 'C': 2, 'G': 3, 'N': 4, 'S': 5, 'T': 6}
+                element_to_int.append(attr_translation[attr.value])
+            sklearn_teach_array_data.append(element_to_int)
 
-    classifier = DecisionTree()
-    classifier.fit(np.array(teach_array_data), np.array(teach_array_values))
+        sklearn_verify_array_data = []
+        for element in verify_array_data:
+            element_to_int = []
+            for attr in element:
+                attr_translation = {'A': 1, 'C': 2, 'G': 3, 'N': 4, 'S': 5, 'T': 6}
+                element_to_int.append(attr_translation[attr.value])
+            sklearn_verify_array_data.append(element_to_int)
 
-    # Testing predciton accuracy
-    predicitions = classifier.predict(verify_array_data)
-    acc = accuracy(verify_array_values, predicitions)
-    print("Own implementation accuracy: " + str(acc))
+        classifier = DecisionTree()
+        classifier.fit(np.array(teach_array_data), np.array(teach_array_values))
 
-    # Creating confusion matrix for our implementation of a decision tree algorithm
-    confusion_matrix = metrics.confusion_matrix(verify_array_values, predicitions)
+        # Testing predciton accuracy
+        predicitions = classifier.predict(verify_array_data)
+        acc = accuracy(verify_array_values, predicitions)
+        print("Own implementation accuracy: " + str(acc))
+
+        # Creating confusion matrix for our implementation of a decision tree algorithm
+        confusion_matrix = metrics.confusion_matrix(verify_array_values, predicitions)
+        conf_matrix_buf[0][0] += confusion_matrix.T[0][0]
+        conf_matrix_buf[0][1] += confusion_matrix.T[0][1]
+        conf_matrix_buf[1][0] += confusion_matrix.T[1][0]
+        conf_matrix_buf[1][1] += confusion_matrix.T[1][1]
+
+        clf = tree.DecisionTreeClassifier(criterion='entropy', max_depth=100, min_samples_split=3)
+        clf = clf.fit(sklearn_teach_array_data, teach_array_values)
+        sklearn_predictions = clf.predict(sklearn_verify_array_data)
+        sklearn_acc = accuracy(verify_array_values, sklearn_predictions)
+        print("Scikit-learn implementation accuracy: " + str(sklearn_acc))
+
+        sklearn_confusion_matrix = metrics.confusion_matrix(verify_array_values, sklearn_predictions)
+        conf_matrix_buf_skilearn[0][0] += sklearn_confusion_matrix.T[0][0]
+        conf_matrix_buf_skilearn[0][1] += sklearn_confusion_matrix.T[0][1]
+        conf_matrix_buf_skilearn[1][0] += sklearn_confusion_matrix.T[1][0]
+        conf_matrix_buf_skilearn[1][1] += sklearn_confusion_matrix.T[1][1]
+
+    conf_matrix_buf[0][0] /= test_number
+    conf_matrix_buf[0][1] /= test_number
+    conf_matrix_buf[1][0] /= test_number
+    conf_matrix_buf[1][1] /= test_number
+    confusion_matrix.T[0][0] = conf_matrix_buf[0][0]
+    confusion_matrix.T[0][1] = conf_matrix_buf[0][1]
+    confusion_matrix.T[1][0] = conf_matrix_buf[1][0]
+    confusion_matrix.T[1][1] = conf_matrix_buf[1][1]
+
+    conf_matrix_buf_skilearn[0][0] /= test_number
+    conf_matrix_buf_skilearn[0][1] /= test_number
+    conf_matrix_buf_skilearn[1][0] /= test_number
+    conf_matrix_buf_skilearn[1][1] /= test_number
+    sklearn_confusion_matrix.T[0][0] = conf_matrix_buf_skilearn[0][0]
+    sklearn_confusion_matrix.T[0][1] = conf_matrix_buf_skilearn[0][1]
+    sklearn_confusion_matrix.T[1][0] = conf_matrix_buf_skilearn[1][0]
+    sklearn_confusion_matrix.T[1][1] = conf_matrix_buf_skilearn[1][1]
+
     cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix=confusion_matrix, display_labels=[0, 1])
     cm_display.plot()
     plt.title(label="Confusion matrix - our implementation")
@@ -114,21 +155,12 @@ def main():
     cm_figure.savefig('confusion_matrix.pdf', format='pdf')
     plt.show()
 
-    clf = tree.DecisionTreeClassifier(criterion='entropy', max_depth=100, min_samples_split=3)
-    clf = clf.fit(sklearn_teach_array_data, teach_array_values)
-    sklearn_predictions = clf.predict(sklearn_verify_array_data)
-    sklearn_acc = accuracy(verify_array_values, sklearn_predictions)
-    print("Scikit-learn implementation accuracy: " + str(sklearn_acc))
-
-    sklearn_confusion_matrix = metrics.confusion_matrix(verify_array_values, sklearn_predictions)
     sklearn_cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix=sklearn_confusion_matrix, display_labels=[0, 1])
     sklearn_cm_display.plot()
     plt.title(label="Confusion matrix - scikit-learn implementation")
     sklearn_cm_figure = plt.gcf()
     sklearn_cm_figure.savefig('sklearn_confusion_matrix.pdf', format='pdf')
     plt.show()
-
-    pass
 
 def accuracy(y_test, y_pred):
     return np.sum(y_test == y_pred) / len(y_test)
