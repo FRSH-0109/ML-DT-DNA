@@ -1,16 +1,17 @@
-from loadData import parseDataToTrainDNA
+from random import randint
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn import tree, metrics
+from loadData import parseDataToTrainDNA
 import classTrainDNA
 from decisionTree import DecisionTree
-from random import randint
+from resultAnalysis import accuracy, calculate_positive_rates,
 
 PATH_DTrain = "dane/spliceDTrainKIS.dat"
 PATH_ATrain = "dane/spliceATrainKIS.dat"
 PATH_ATrain_small = "dane/spliceATrainKIS_small.dat"
 
-test_number = 5
+test_number = 25
 
 def createPoolTeachAndVerify(data_array, teach_ratio = float):
     data_array_size = len(data_array)
@@ -60,7 +61,6 @@ def createPoolTeachAndVerify(data_array, teach_ratio = float):
 
     return teach_array, verify_array
 
-
 def main():
 
     dtrain_array = parseDataToTrainDNA(PATH_DTrain)
@@ -68,6 +68,8 @@ def main():
     atrain_small_array = parseDataToTrainDNA(PATH_ATrain_small)
     conf_matrix_buf = [[0, 0],[0, 0]]
     conf_matrix_buf_skilearn = [[0, 0],[0, 0]]
+    acc_per_test = []
+    sklearn_acc_per_test = []
 
     for i in range(0, test_number):
 
@@ -109,7 +111,7 @@ def main():
         # Testing predciton accuracy
         predicitions = classifier.predict(verify_array_data)
         acc = accuracy(verify_array_values, predicitions)
-        print("Own implementation accuracy: " + str(acc))
+        acc_per_test.append(acc)
 
         # Creating confusion matrix for our implementation of a decision tree algorithm
         confusion_matrix = metrics.confusion_matrix(verify_array_values, predicitions)
@@ -122,13 +124,19 @@ def main():
         clf = clf.fit(sklearn_teach_array_data, teach_array_values)
         sklearn_predictions = clf.predict(sklearn_verify_array_data)
         sklearn_acc = accuracy(verify_array_values, sklearn_predictions)
-        print("Scikit-learn implementation accuracy: " + str(sklearn_acc))
+        sklearn_acc_per_test.append(sklearn_acc)
 
         sklearn_confusion_matrix = metrics.confusion_matrix(verify_array_values, sklearn_predictions)
         conf_matrix_buf_skilearn[0][0] += sklearn_confusion_matrix.T[0][0]
         conf_matrix_buf_skilearn[0][1] += sklearn_confusion_matrix.T[0][1]
         conf_matrix_buf_skilearn[1][0] += sklearn_confusion_matrix.T[1][0]
         conf_matrix_buf_skilearn[1][1] += sklearn_confusion_matrix.T[1][1]
+
+    acc_avg = (sum(acc_per_test) / len(acc_per_test))
+    sklearn_acc_avg = (sum(sklearn_acc_per_test) / len(sklearn_acc_per_test))
+
+    print("Own implementation avarege accuracy: " + str(acc_avg))
+    print("Scikit-learn implementation average accuracy: " + str(sklearn_acc_avg))
 
     conf_matrix_buf[0][0] /= test_number
     conf_matrix_buf[0][1] /= test_number
@@ -148,6 +156,14 @@ def main():
     sklearn_confusion_matrix.T[1][0] = conf_matrix_buf_skilearn[1][0]
     sklearn_confusion_matrix.T[1][1] = conf_matrix_buf_skilearn[1][1]
 
+    true_positive_rate, false_positive_rate = calculate_positive_rates(confusion_matrix)
+    print("Average true positive rate for our implementation: " + str(true_positive_rate))
+    print("Average false positive rate for our implementation: " + str(false_positive_rate))
+
+    sk_true_positive_rate, sk_false_positive_rate = calculate_positive_rates(sklearn_confusion_matrix)
+    print("Average true positive rate for scikit-learn implementation: " + str(sk_true_positive_rate))
+    print("Average false positive rate for scikit-learn implementation: " + str(sk_false_positive_rate))
+
     cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix=confusion_matrix, display_labels=[0, 1])
     cm_display.plot()
     plt.title(label="Confusion matrix - our implementation")
@@ -161,9 +177,6 @@ def main():
     sklearn_cm_figure = plt.gcf()
     sklearn_cm_figure.savefig('sklearn_confusion_matrix.pdf', format='pdf')
     plt.show()
-
-def accuracy(y_test, y_pred):
-    return np.sum(y_test == y_pred) / len(y_test)
 
 if __name__ == "__main__":
     main()
