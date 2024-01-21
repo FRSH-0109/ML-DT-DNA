@@ -1,6 +1,7 @@
 from loadData import parseDataToTrainDNA
 import numpy as np
-from sklearn import tree
+import matplotlib.pyplot as plt
+from sklearn import tree, metrics
 import classTrainDNA
 from decisionTree import DecisionTree
 from random import randint
@@ -99,15 +100,27 @@ def main():
     classifier = DecisionTree()
     classifier.fit(np.array(teach_array_data), np.array(teach_array_values))
 
+    # Testing predciton accuracy
     predicitions = classifier.predict(verify_array_data)
     acc = accuracy(verify_array_values, predicitions)
     print("Own implementation accuracy: " + str(acc))
+
+    # Creating confusion matrix for our implementation of a decision tree algorithm
+    confusion_matrix = metrics.confusion_matrix(verify_array_values, predicitions)
+    cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix=confusion_matrix, display_labels=[0, 1])
+    cm_display.plot()
+    plt.show()
 
     clf = tree.DecisionTreeClassifier(criterion='entropy', max_depth=100, min_samples_split=3)
     clf = clf.fit(sklearn_teach_array_data, teach_array_values)
     sklearn_predictions = clf.predict(sklearn_verify_array_data)
     sklearn_acc = accuracy(verify_array_values, sklearn_predictions)
     print("Scikit-learn implementation accuracy: " + str(sklearn_acc))
+
+    sklearn_confusion_matrix = metrics.confusion_matrix(verify_array_values, sklearn_predictions)
+    sklearn_cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix=sklearn_confusion_matrix, display_labels=[0, 1])
+    sklearn_cm_display.plot()
+    plt.show()
 
     pass
 
