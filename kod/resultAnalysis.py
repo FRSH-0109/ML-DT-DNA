@@ -5,9 +5,9 @@ def accuracy(y_test, y_pred):
 
 def calculate_positive_rates(confusion_matrix):
     true_negative = confusion_matrix[0][0]
-    true_positive = confusion_matrix[0][1]
-    false_negative = confusion_matrix[1][0]
-    false_positive = confusion_matrix[1][1]
+    false_negative = confusion_matrix[0][1]
+    false_positive = confusion_matrix[1][0]
+    true_positive = confusion_matrix[1][1]
 
     true_positive_rate = true_positive / (true_positive + false_negative)
     false_positive_rate = false_positive / (false_positive + true_negative)

@@ -11,7 +11,7 @@ PATH_DTrain = "dane/spliceDTrainKIS.dat"
 PATH_ATrain = "dane/spliceATrainKIS.dat"
 PATH_ATrain_small = "dane/spliceATrainKIS_small.dat"
 
-test_number = 50
+test_number = 25
 
 def createPoolTeachAndVerify(data_array, teach_ratio = float):
     data_array_size = len(data_array)
@@ -76,7 +76,7 @@ def main():
     for i in range(0, test_number):
 
         #create teach and verify pool by given data, ratio is teach size to whole array size
-        teach_array, verify_array = createPoolTeachAndVerify(dtrain_array, 0.8)
+        teach_array, verify_array = createPoolTeachAndVerify(atrain_array, 0.9)
 
         #prepare data to be passed to decision tree
         verify_array_data = []
@@ -107,7 +107,7 @@ def main():
                 element_to_int.append(attr_translation[attr.value])
             sklearn_verify_array_data.append(element_to_int)
 
-        classifier = DecisionTree(max_depth=100, min_sample_size=3, gini_index=False)
+        classifier = DecisionTree(max_depth=10, min_sample_size=40, gini_index=True)
         classifier.fit(np.array(teach_array_data), np.array(teach_array_values))
 
         # Testing predciton accuracy
@@ -125,7 +125,7 @@ def main():
         conf_matrix_buf[1][0] += confusion_matrix.T[1][0]
         conf_matrix_buf[1][1] += confusion_matrix.T[1][1]
 
-        clf = tree.DecisionTreeClassifier(criterion='entropy', max_depth=100, min_samples_split=3)
+        clf = tree.DecisionTreeClassifier(criterion='gini', max_depth=10, min_samples_split=40)
         clf = clf.fit(sklearn_teach_array_data, teach_array_values)
         sklearn_test_predictions = clf.predict(sklearn_teach_array_data)
         sklearn_predictions = clf.predict(sklearn_verify_array_data)

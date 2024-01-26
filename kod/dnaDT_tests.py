@@ -92,7 +92,7 @@ def test_decisionTreeClass():
     assert(test_decision_tree.max_depth == 50)
 
 def test_calculate_positive_rates():
-    confusion_matrix = [[100, 75], [75, 25]]
+    confusion_matrix = [[100, 75], [25, 75]]
     true_positive_rate, false_positive_rate = calculate_positive_rates(confusion_matrix)
     assert(true_positive_rate == 0.5)
     assert(false_positive_rate == 0.2)
