@@ -76,7 +76,7 @@ def main():
     for i in range(0, test_number):
 
         #create teach and verify pool by given data, ratio is teach size to whole array size
-        teach_array, verify_array = createPoolTeachAndVerify(atrain_array, 0.5)
+        teach_array, verify_array = createPoolTeachAndVerify(dtrain_array, 0.8)
 
         #prepare data to be passed to decision tree
         verify_array_data = []
@@ -107,7 +107,7 @@ def main():
                 element_to_int.append(attr_translation[attr.value])
             sklearn_verify_array_data.append(element_to_int)
 
-        classifier = DecisionTree()
+        classifier = DecisionTree(max_depth=100, min_sample_size=3, gini_index=False)
         classifier.fit(np.array(teach_array_data), np.array(teach_array_values))
 
         # Testing predciton accuracy
@@ -168,10 +168,20 @@ def main():
     sklearn_confusion_matrix.T[1][0] = conf_matrix_buf_skilearn[1][0]
     sklearn_confusion_matrix.T[1][1] = conf_matrix_buf_skilearn[1][1]
 
+    true_negative = confusion_matrix.T[0][0]
+    false_negative = confusion_matrix.T[0][1]
+    false_positive = confusion_matrix.T[1][0]
+    true_positive = confusion_matrix.T[1][1]
+
+    sklearn_true_negative = sklearn_confusion_matrix.T[0][0]
+    sklearn_false_negative = sklearn_confusion_matrix.T[0][1]
+    sklearn_false_positive = sklearn_confusion_matrix.T[1][0]
+    sklearn_true_positive = sklearn_confusion_matrix.T[1][1]
+
     true_positive_rate, false_positive_rate = calculate_positive_rates(confusion_matrix)
-    precision = calculate_precision(confusion_matrix[0][1], confusion_matrix[1][1])
-    sensitivity = calculate_sensitivity(confusion_matrix[0][1], confusion_matrix[1][0])
-    f1_score = calculate_f1_score(confusion_matrix[0][1], confusion_matrix[1][1], confusion_matrix[1][0])
+    precision = calculate_precision(true_positive, false_positive)
+    sensitivity = calculate_sensitivity(true_positive, false_negative)
+    f1_score = calculate_f1_score(true_positive, false_positive, false_negative)
     print("Average true positive rate for our implementation: " + str(true_positive_rate))
     print("Average false positive rate for our implementation: " + str(false_positive_rate))
     print("Average precision rate for our implementation: " + str(precision))
@@ -179,9 +189,9 @@ def main():
     print("Average F1-Score for our implementation: " + str(f1_score) + '\n')
 
     sk_true_positive_rate, sk_false_positive_rate = calculate_positive_rates(sklearn_confusion_matrix)
-    sklearn_precision = calculate_precision(sklearn_confusion_matrix[0][1], sklearn_confusion_matrix[1][1])
-    sklearn_sensitivity = calculate_sensitivity(sklearn_confusion_matrix[0][1], sklearn_confusion_matrix[1][0])
-    sklearn_f1_score = calculate_f1_score(sklearn_confusion_matrix[0][1], sklearn_confusion_matrix[1][1], sklearn_confusion_matrix[1][0])
+    sklearn_precision = calculate_precision(sklearn_true_positive, sklearn_false_positive)
+    sklearn_sensitivity = calculate_sensitivity(sklearn_true_positive, sklearn_false_negative)
+    sklearn_f1_score = calculate_f1_score(sklearn_true_positive, sklearn_false_positive, sklearn_false_negative)
     print("Average true positive rate for scikit-learn implementation: " + str(sk_true_positive_rate))
     print("Average false positive rate for scikit-learn implementation: " + str(sk_false_positive_rate))
     print("Average precision rate for scikit-learn implementation: " + str(sklearn_precision))
