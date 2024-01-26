@@ -1,3 +1,8 @@
+"""
+DNA structure used as a data for the Decision Tree algorithm
+Created by Kamil Kośnik, Kacper Radzikowski
+"""
+
 import numpy as np
 from enum import Enum
 

@@ -1,3 +1,8 @@
+"""
+Unit tests for the DecisionTree algorithm
+Created by Kamil Kośnik, Kacper Radzikowski
+"""
+
 import pytest
 from loadData import parseDataToTrainDNA
 from classTrainDNA import DnaAttrVal, TrainDNA

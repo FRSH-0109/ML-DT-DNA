@@ -1,3 +1,8 @@
+"""
+Main program file
+Created by Kamil Kośnik, Kacper Radzikowski
+"""
+
 from random import randint
 import numpy as np
 import matplotlib.pyplot as plt

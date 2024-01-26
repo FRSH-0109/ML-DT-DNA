@@ -1,4 +1,7 @@
-
+"""
+DecisionTree Node class
+Created by Kamil Kośnik, Kacper Radzikowski
+"""
 
 class Node:
     def __init__(self, feature=None, criteria=None, left=None, right=None, *, value=None):

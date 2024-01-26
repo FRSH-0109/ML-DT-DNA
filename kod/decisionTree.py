@@ -1,3 +1,8 @@
+"""
+DecisionTree class
+Created by Kamil Kośnik, Kacper Radzikowski
+"""
+
 import numpy as np
 from itertools import combinations
 from node import Node

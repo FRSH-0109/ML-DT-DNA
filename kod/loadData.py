@@ -1,3 +1,8 @@
+"""
+Data parser
+Created by Kamil Kośnik, Kacper Radzikowski
+"""
+
 import numpy as np
 from classTrainDNA import TrainDNA
 

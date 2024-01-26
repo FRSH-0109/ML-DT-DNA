@@ -1,3 +1,8 @@
+"""
+Functions used in analysis of the experiments results
+Created by Kamil Kośnik, Kacper Radzikowski
+"""
+
 import numpy as np
 
 def accuracy(y_test, y_pred):
